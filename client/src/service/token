@@ -1,0 +1,15 @@
+ import jwt_decode from "jwt-decode";
+
+export function getToken() {
+  const token = localStorage.getItem("authToken");
+  return token;
+}
+
+export function getDecodeToken() {
+  const token = getToken();
+  if (token) {
+    const decodedToken = jwt_decode(token);
+    return decodedToken;
+  }
+  return null;
+}

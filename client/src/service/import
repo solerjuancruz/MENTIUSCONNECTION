@@ -1,0 +1,29 @@
+ import { useEffect } from "react";
+import jwt_decode from "jwt-decode";
+
+export function outToken() {
+  useEffect(() => {
+    const token = localStorage.getItem("authToken");
+
+    // Verifica si el token existe y si ha expirado
+    if (token) {
+      const tokenData = decodeToken(token);
+      const currentTime = Date.now() / 1000; // Fecha actual en segundos
+
+      if (tokenData.exp < currentTime) {
+        // El token ha expirado, elimina el token
+        localStorage.removeItem("authToken");
+      }
+    }
+  }, []);
+
+
+
+  localStorage.removeItem("authToken");
+}
+
+function decodeToken(token) {
+ return jwt_decode(token);
+}
+
+export default outToken;
