@@ -2,14 +2,18 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import FijaDigitalCreate from "./FijaDigitalCreate.jsx";
 import FijaDigitalEdit from "./FijaDigitalEdit.jsx";
+import FijaDigitalShow from "./FijaDigitalShow.jsx";
 
 const TablafijaDigital = () => {
   const [fijaDigital, setFijaDigital] = useState([]);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [showEditForm, setShowEditForm] = useState(false);
+  const [showViewForm, setShowViewForm] = useState(false);
+  const [selectedRecord, setSelectedRecord] = useState("");
   const [message, setMessage] = useState("");
+  const [showModal, setShowModal] = useState(false);
 
-  useEffect(() => {
+  const cargarRegistros = () => {
     axios
       .get("http://localhost:8000/api/fijadigitals")
       .then((response) => {
@@ -18,6 +22,10 @@ const TablafijaDigital = () => {
       .catch((error) => {
         console.error("Error al obtener datos:", error);
       });
+  };
+
+  useEffect(() => {
+    cargarRegistros();
   }, []);
 
   const eliminarRegistro = (id) => {
@@ -26,50 +34,77 @@ const TablafijaDigital = () => {
       .then((response) => {
         setMessage(response.data.message);
         setShowModal(true);
-        setFijaDigital(response.data);
+        cargarRegistros();
       })
       .catch((error) => {
         setMessage("Error al eliminar el registro");
       });
   };
-  const [showModal, setShowModal] = useState(false);
+
+  const ShowRegistro = (id) => {
+    axios
+      .get(`http://localhost:8000/api/fijadigital/${id}`)
+      .then((response) => {
+        setSelectedRecord(response.data);
+        setShowViewForm(true);
+      })
+      .catch((error) => {
+        setMessage("Error al obtener el registro");
+      });
+  };
+
+  const EditRegistro = (id) => {
+    axios
+      .get(`http://localhost:8000/api/fijadigital/${id}`)
+      .then((response) => {
+        setSelectedRecord(response.data);
+        setShowEditForm(true);
+      });
+  };
 
   const handleCreateClick = () => {
     setShowCreateForm(true);
-
   };
 
   const handleCloseCreateForm = () => {
     setShowCreateForm(false);
-  };
-
-  const [editRecordId, setEditRecordId] = useState(null);
-
-  const handleEditClick = (id) => {
-    setEditRecordId(id);
-    setShowEditForm(true)
+    cargarRegistros();
   };
 
   const handleCloseEditClick = () => {
-    setEditRecordId(null);
+    setSelectedRecord("");
     setShowEditForm(false);
+    cargarRegistros();
   };
 
+  const handleCloseShowClick = () => {
+    setShowViewForm(false);
+  };
   return (
     <div className="content">
-      {showCreateForm || showEditForm ? (
+      {showCreateForm || (showEditForm && selectedRecord) || showViewForm ? (
         showCreateForm ? (
           <FijaDigitalCreate onClose={handleCloseCreateForm} />
         ) : (
-          <FijaDigitalEdit
-            recordId={editRecordId}
-            onClose={handleCloseEditClick}
-          />
+          <>
+            {showEditForm && selectedRecord && (
+              <FijaDigitalEdit
+                idRecord={selectedRecord}
+                onClose={handleCloseEditClick}
+              />
+            )}
+            {showViewForm && (
+              <FijaDigitalShow
+                recordId={selectedRecord}
+                onClose={handleCloseShowClick}
+              />
+            )}
+          </>
         )
       ) : (
         <div className="container">
           <button
-            className="btn btn-outline-info btn-lg "
+            className="btn btn-outline-info btn-lg"
             onClick={handleCreateClick}
           >
             Crear
@@ -96,7 +131,7 @@ const TablafijaDigital = () => {
                   <td>
                     <button
                       className="btn btn-success mr-2"
-                      onClick={() => handleEditClick(fijadigital.id)}
+                      onClick={() => EditRegistro(fijadigital.id)}
                     >
                       Editar
                     </button>
@@ -106,7 +141,12 @@ const TablafijaDigital = () => {
                     >
                       Eliminar
                     </button>
-                    <button className="btn btn-warning mr-2">Ver</button>
+                    <button
+                      className="btn btn-warning mr-2"
+                      onClick={() => ShowRegistro(fijadigital.id)}
+                    >
+                      Ver
+                    </button>
                   </td>
                 </tr>
               ))}
@@ -114,7 +154,7 @@ const TablafijaDigital = () => {
           </table>
           {/* Modal */}
           {showModal && (
-            <div className="modal-overlay ">
+            <div className="modal-overlay">
               <div className="modal-content">
                 <h2>
                   <strong>¡Éxito!</strong>
@@ -123,7 +163,6 @@ const TablafijaDigital = () => {
                 <button
                   onClick={() => {
                     setShowModal(false);
-                    /*   onClose(); // */
                   }}
                 >
                   Cerrar

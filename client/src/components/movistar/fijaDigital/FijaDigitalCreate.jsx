@@ -74,6 +74,14 @@ export default function FijaDigitalCreate({ onClose }) {
         <img />
         <h3 aline="center">FIJA DIGITAL</h3>
       </center>
+      <button
+        className="btn btn-info float-lg-right m-2"
+        onClick={() => {
+          onClose();
+        }}
+      >
+        atrás
+      </button>
 
       <form onSubmit={formSubmit} className="form-horizontal">
         <div className="container-movistar-fijadigital">
@@ -182,7 +190,7 @@ export default function FijaDigitalCreate({ onClose }) {
                 type="radio"
                 name="selector"
                 id="selector1"
-                value={formData.selector}
+                value={"Leads"}
                 onChange={handleInputChange}
                 required
               />
@@ -196,7 +204,7 @@ export default function FijaDigitalCreate({ onClose }) {
                 type="radio"
                 name="selector"
                 id="selector2"
-                value={formData.selector}
+                value={"BBDD"}
                 onChange={handleInputChange}
               />
             </div>

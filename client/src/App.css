@@ -568,9 +568,9 @@ a {
 .modal-overlay {
   position: fixed !important;
   top: 0;
-  left: 50vh;
-  width: 50%;
-  height: 50%;
+  left: 0;
+  width: 100%;
+  height: 100%;
   background-color: rgba(0, 0, 0, 0.5);
   display: flex !important;
   justify-content: center !important;
@@ -578,6 +578,8 @@ a {
 }
 
 .modal-content {
+  width: 80vh;
+  height: 40vh;
   background-color: #fff;
   padding: 20px;
   border-radius: 5px;
